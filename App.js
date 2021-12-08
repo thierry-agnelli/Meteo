@@ -1,21 +1,51 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+// Dépendances
+import React, {useState, useEffect} from 'react';
+import { SafeAreaView } from 'react-native';
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createContext } from 'react';
+// Composants
+import SearchWeatherbyCity from './assets/views/CurrentWeather/SearchWeatherByCity.js';
+import LocalForecast from './assets/views/LocalForecast/LocalForcast.js';
+// Images
+import background from "./assets/medias/images/background.jpg";
+// Lib
+import Localization from './assets/lib/localization.js';
 
-export default function App() {
+
+// Créatioons du ùenu de navigation
+const Tab = createBottomTabNavigator();
+
+// Création contexte
+export const AppContext = createContext();
+
+const App = () => {
+  //Variable d'états
+  const [coords, setCoords] = useState(null);
+
+
+  useEffect(() =>{
+    console.log(coords);
+  }, [coords])
+
+  // Contexte
+  const contextValue= {
+    getCoords: () => coords,
+    setCoords
+  };
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <AppContext.Provider value={contextValue}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <NavigationContainer>
+          <Tab.Navigator screenOptions={{ headerShown: false }} >
+            <Tab.Screen name="searchWeather" component={SearchWeatherbyCity} />
+            <Tab.Screen name="localForecast" component={LocalForecast} />
+          </Tab.Navigator>
+        </NavigationContainer>
+      </SafeAreaView>
+    </AppContext.Provider>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
