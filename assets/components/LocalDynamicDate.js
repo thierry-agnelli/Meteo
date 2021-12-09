@@ -9,6 +9,12 @@ import "moment/locale/fr";
 const LocalDynamicDate = props => {
     const [date, setDate] = useState(null);
 
+    /* Hooks */
+    useEffect(() => {
+        const formatedDate = moment(tzMoment.tz(Date.now() + props.timestamp, "Etc/UTC")).locale("fr").format("dddd DD MMMM YYYY, HH:mm:ss");
+        setDate(formatedDate[0].toUpperCase() + formatedDate.slice(1));
+    },[])
+
     // Timer de refresh de 1s
     setTimeout(() => {
         const formatedDate = moment(tzMoment.tz(Date.now() + props.timestamp, "Etc/UTC")).locale("fr").format("dddd DD MMMM YYYY, HH:mm:ss");

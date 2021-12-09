@@ -78,7 +78,18 @@ const style = StyleSheet.create({
     },
     currentWeatherBottom:{
         flex:4.5,
-        // backgroundColor: "#0000FF"
+    },
+    dailyForecastContainer:{
+        flex: 0.4,
+        margin: 10,
+        marginTop: 50,
+        padding: 10,
+        borderRadius: 10,
+        // padding: 10,
+        backgroundColor: "#45454560"
+    },
+    forecastItem:{
+        margin: 5
     },
     test:{
         backgroundColor:"red"
