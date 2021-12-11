@@ -47,16 +47,16 @@ const style = StyleSheet.create({
         alignItems:"center"
     },
     currentWeatherMiddle:{
-        flex:3,
+        flex:3.5,
         alignSelf: "center",
-        width: getHeightWithRatio(26.5),
-        borderRadius: 200,
+        width: getHeightWithRatio(28.5),
+        borderRadius: 250,
         backgroundColor: "#45454560"
     },
     humidityAndPressure:{
         flex:1,
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "flex-start",
     },
     todayCenterContainer:{
         flex: 1,
@@ -74,22 +74,18 @@ const style = StyleSheet.create({
     currentTempAndWind:{
         flex:1,
         alignItems: "center",
-        justifyContent:"flex-start",
+        justifyContent: "flex-end",
     },
     currentWeatherBottom:{
         flex:4.5,
     },
     dailyForecastContainer:{
-        flex: 0.4,
+        flex: 0.5,
         margin: 10,
         marginTop: 50,
         padding: 10,
         borderRadius: 10,
-        // padding: 10,
         backgroundColor: "#45454560"
-    },
-    forecastItem:{
-        margin: 5
     },
     test:{
         backgroundColor:"red"

@@ -5,12 +5,12 @@ import moment from "moment";
 import tzMoment from "moment-timezone";
 import "moment/locale/fr";
 // Composants
-import LocalDynamicDate from "../../components/LocalDynamicDate.js";
+import LocalDynamicDate from "../../components/LocalDynamicDate/LocalDynamicDate.js";
+import ForecastContainer from "../../components/ForecastContainer/ForecastContainer.js";
 // Style
 import style from "./style.js";
 // Lib
 import imagesTable from "../../lib/imagesTable.js";
-import Localization from "../../lib/localization.js";
 import { timestampToHour } from "../../lib/time.js";
 // Config
 import config from "../../config/config.json";
@@ -21,33 +21,21 @@ import { AppContext } from "../../../App.js";
 const TodayWeather = () => {
     /* Variables d'états */
     const [currentWeather, setCurrentWeather] = useState(null);
-    const [currentWeatherb, setCurrentWeatherb] = useState(null);
     const [city, setCity] = useState("");
     const [forecast, setForecast] = useState(null);
+    const [timerRefresh, setTimerRefresh] = useState(false);
 
     /* Contexte */
     const context = useContext(AppContext);
 
     /* Hooks */
-    useEffect(() => {
-        // Récupération des coordonnées de l'appareil (si l'utilisateur l'authorise)
-        Localization.getPermission()
-            .then(async permission => {
-                if (permission) {
-                    const { latitude, longitude } = await Localization.getLocation();
-                    // Enregistrement des coordonnées dans le contexte
-                    context.setCoords({ latitude, longitude });
-                }
-            });
-    }, []);
-
     // Récupération de la météo courante en fonction des coordonnées
     useEffect(() => {
         if (context.getCoords()) {
             const { latitude, longitude } = context.getCoords();
             fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${config.API_KEY}`)
                 .then(response => response.json())
-                .then(json => setCurrentWeatherb(json))
+                .then(json => setCurrentWeather(json))
                 .catch(err => console.log(err));
 
 
@@ -60,10 +48,7 @@ const TodayWeather = () => {
         }
         else
             console.log("coords null");
-
-    }, [context.getCoords()]);
-
-    useEffect(() => console.log(forecast), [forecast]);
+    }, [context.getCoords(), context.getRefresh()]);
 
     /* Handlers */
     // Entrée utilisateur de la ville
@@ -75,7 +60,6 @@ const TodayWeather = () => {
         fetch(`https://geo.api.gouv.fr/communes?nom=${city}&fields=centre`)
             .then(response => response.json())
             .then(json => {
-                console.log(json);
                 let latitude = json[0].centre.coordinates[1];
                 let longitude = json[0].centre.coordinates[0];
                 context.setCoords({ latitude, longitude })
@@ -127,69 +111,75 @@ const TodayWeather = () => {
                 <View style={style.currentWeatherContainer}>
                     <View style={style.currentWeatherTop}>
                         <View style={style.cityContainer}>
-                            <Text style={{ fontSize: 35 }}>{currentWeatherb?.name}</Text>
+                            <Text style={{ fontSize: 35 }}>{currentWeather?.name}</Text>
                         </View>
                         <View style={style.todayInfoContainer}>
                             <View style={style.dateContainer}>
                                 {/* <Text style={{ fontSize: 25 }}>{currentWeather ? formatFrDate(Date.now() + currentWeather.timezone * 1000) : ""}</Text> */}
-                                {currentWeatherb ? <LocalDynamicDate timestamp={currentWeatherb.timezone * 1000} /> : null}
+                                {currentWeather ? <LocalDynamicDate timestamp={currentWeather.timezone * 1000} /> : null}
                             </View>
                             <View style={style.sunInfoContainer}>
                                 <View style={style.sunInfo}>
-                                    <Text>{currentWeatherb ? `Lever: ${timestampToHour(currentWeatherb.sys.sunrise + currentWeatherb.timezone)}` : null}</Text>
+                                    <Text>{currentWeather ? `Lever: ${timestampToHour(currentWeather.sys.sunrise + currentWeather.timezone)}` : null}</Text>
                                 </View>
                                 <View style={style.sunInfo}>
-                                    <Text>{currentWeatherb ? `Coucher: ${timestampToHour(currentWeatherb.sys.sunset + currentWeatherb.timezone)}` : null}</Text>
+                                    <Text>{currentWeather ? `Coucher: ${timestampToHour(currentWeather.sys.sunset + currentWeather.timezone)}` : null}</Text>
                                 </View>
                             </View>
                         </View>
                     </View>
                     <View style={style.currentWeatherMiddle}>
-                        <View style={style.humidityAndPressure}>
-                            {currentWeatherb ?
+                        <View style={style.currentTempAndWind}>
+                            <Text style={{ fontSize: 30, fontWeight: "bold" }}>{currentWeather ? `${(currentWeather.main.temp - 273.15).toFixed(1)}°C` : ""}</Text>
+                            <Text style={{ fontSize: 15 }}>{currentWeather ? `Ressenti: ${(currentWeather.main.feels_like - 273.15).toFixed(1)}°C` : ""}</Text>
+                        </View>
+                        {/* <View style={style.humidityAndPressure}>
+                            {currentWeather ?
                                 <>
-                                    <Text>Pression: {currentWeatherb.main.pressure}hp</Text>
-                                    <Text>humidité: {currentWeatherb.main.humidity}%</Text>
+                                    <Text style={{ marginTop: 15 }}>Pression: {currentWeather.main.pressure}hp</Text>
+                                    <Text style={{ margin: 3 }}>Humidité: {currentWeather.main.humidity}%</Text>
+                                    <Text>Vent: {(currentWeather.wind.speed * 3.6).toFixed(2)}km/h</Text>
+                                </>
+                                : null}
+                        </View> */}
+                        <View style={style.todayCenterContainer}>
+                            <View style={[style.sideTemp, { paddingLeft: 10 }]}>
+                                {currentWeather ?
+                                    <>
+                                        <Text>Min:</Text>
+                                        <Text>{`${(currentWeather.main.temp_min - 273.15).toFixed(1)}°C`}</Text>
+                                    </>
+                                    : null}
+                            </View>
+                            <Image source={{ uri: `http://openweathermap.org/img/wn/${currentWeather?.weather[0].icon}@2x.png` }} style={{ height: 100, width: 100 }} />
+                            <View style={[style.sideTemp, { paddingRight: 10 }]}>
+                                {currentWeather ?
+                                    <>
+                                        <Text>Max:</Text>
+                                        <Text>{`${(currentWeather.main.temp_max - 273.15).toFixed(1)}°C`}</Text>
+                                    </>
+                                    : null}
+                            </View>
+                        </View>
+                        <View style={style.humidityAndPressure}>
+                            {currentWeather ?
+                                <>
+                                    <Text>Pression: {currentWeather.main.pressure}hp / Humidité: {currentWeather.main.humidity}%</Text>
+                                    <Text>Vent: {(currentWeather.wind.speed * 3.6).toFixed(2)}km/h</Text>
                                 </>
                                 : null}
                         </View>
-                        <View style={style.todayCenterContainer}>
-                            <View style={[style.sideTemp, { paddingLeft: 10 }]}>
-                                {currentWeatherb ?
-                                    <>
-                                        <Text>Min:</Text>
-                                        <Text>{`${(currentWeatherb.main.temp_min - 273.15).toFixed(1)}°C`}</Text>
-                                    </>
-                                    : null}
-                            </View>
-                            {/* <Image source={{uri:"http://openweathermap.org/img/wn/10d@2x.png"}} style={{height: 100, width: 100}}/> */}
-                            <Image source={{ uri: `http://openweathermap.org/img/wn/${currentWeatherb?.weather[0].icon}@2x.png` }} style={{ height: 100, width: 100 }} />
-                            <View style={[style.sideTemp, { paddingRight: 10 }]}>
-                                {currentWeatherb ?
-                                    <>
-                                        <Text>Max:</Text>
-                                        <Text>{`${(currentWeatherb.main.temp_max - 273.15).toFixed(1)}°C`}</Text>
-                                    </>
-                                    : null}
-                            </View>
-                        </View>
-                        <View style={style.currentTempAndWind}>
-                            <Text style={{ fontSize: 30, fontWeight: "bold" }}>{currentWeatherb ? `${(currentWeatherb.main.temp - 273.15).toFixed(1)}°C` : ""}</Text>
-                            <Text>{currentWeatherb ? `Vent: ${(currentWeatherb.wind.speed * 3.6).toFixed(2)} km/h` : ""}</Text>
-                        </View>
+                        {/* <View style={style.currentTempAndWind}>
+                            <Text style={{ fontSize: 30, fontWeight: "bold"}}>{currentWeather ? `${(currentWeather.main.temp - 273.15).toFixed(1)}°C` : ""}</Text>
+                            <Text style={{ fontSize: 15 }}>{currentWeather ? `Ressenti: ${(currentWeather.main.feels_like - 273.15).toFixed(1)}°C` : ""}</Text>
+                        </View> */}
                     </View>
                     <View style={style.currentWeatherBottom}>
                         <View style={style.dailyForecastContainer}>
-                            <Text>Prévisions du jour :</Text>
-                            <ScrollView horizontal>
-                                {forecast?.map((item, index) =>
-                                    <View key={index} style={style.forecastItem}>
-                                        <Text>{timestampToHour(item.dt)}</Text>
-                                        <Image source={{ uri: `http://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png` }} style={{ height: 40, width: 40 }} />
-                                        <Text>{(item.temp - 273.15).toFixed(1)}°C</Text>
-                                    </View>
-                                )}
-                            </ScrollView>
+                            <Text style={{ fontSize: 20 }}>Prévisions du jour :</Text>
+                            <View style={{ flex: 1 }}>
+                                <ForecastContainer forecast={forecast} />
+                            </View>
                         </View>
                     </View>
                 </View>
