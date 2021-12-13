@@ -23,7 +23,6 @@ const WeekForecast = () => {
     /* Hooks */
     // Récupération des prévisions sur 5 jours toutes les 3h (au chargement ou au moment de récupération des coordonnées)
     useEffect(() => {
-        console.log("forecast");
         if (context.getCoords()) {
             const { latitude, longitude } = context.getCoords();
             console.log("week");
@@ -54,7 +53,7 @@ const WeekForecast = () => {
                 })
                 .catch(err => console.log(err));
         }
-    }, [context.getCoords()]);
+    }, [context.getCoords(), context.getRefresh()]);
 
 
     return (

@@ -24,11 +24,13 @@ export const AppContext = createContext();
 const App = () => {
   //Variable d'états
   const [coords, setCoords] = useState(null);
-  const [refresh, setRefresh] = useState(false);
+  const [refresh, setRefresh] = useState();
 
  /* Hooks */
  // Récupération des coordonnées de l'appareil (si l'utilisateur l'authorise) 
  useEffect (() => {
+    console.log("start");
+    setRefresh(true);
     Localization.getPermission()
     .then(async permission => {
         if (permission) {

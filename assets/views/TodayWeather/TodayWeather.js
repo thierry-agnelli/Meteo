@@ -31,6 +31,7 @@ const TodayWeather = () => {
     /* Hooks */
     // Récupération de la météo courante en fonction des coordonnées
     useEffect(() => {
+        console.log("today");
         if (context.getCoords()) {
             const { latitude, longitude } = context.getCoords();
             fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${config.API_KEY}`)
