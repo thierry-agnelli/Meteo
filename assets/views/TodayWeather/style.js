@@ -24,7 +24,7 @@ const style = StyleSheet.create({
         flex: 9,
     },
     currentWeatherTop:{
-        flex:2.5
+        flex:3,
     },
     cityContainer:{
         flex: 1,
@@ -47,9 +47,10 @@ const style = StyleSheet.create({
         alignItems:"center"
     },
     currentWeatherMiddle:{
-        flex:3.5,
+        flex:4,
         alignSelf: "center",
-        width: getHeightWithRatio(28.5),
+        justifyContent: "center",
+        width: getHeightWithRatio(31),
         borderRadius: 250,
         backgroundColor: "#45454560"
     },
@@ -77,7 +78,9 @@ const style = StyleSheet.create({
         justifyContent: "flex-end",
     },
     currentWeatherBottom:{
-        flex:4.5,
+        flex: 3,
+        paddingTop: 20,
+        justifyContent: "center"
     },
     dailyForecastContainer:{
         flex: 0.5,

@@ -39,10 +39,6 @@ const App = () => {
     });
   }, []);
 
-  // useEffect(() =>{
-  //   console.log("coords", coords);
-  // }, [coords])
-
   // Timer de refresh de l'app toutes les 30mn (si des coordoonnées sont présentes)
   useEffect(() =>{
     if(coords)
@@ -61,7 +57,7 @@ const App = () => {
     <AppContext.Provider value={contextValue}>
       <SafeAreaView style={{ flex: 1 }}>
         <NavigationContainer>
-          <Tab.Navigator screenOptions={{ headerShown: false }} >
+          <Tab.Navigator screenOptions={{ headerShown: false }}>
             <Tab.Screen
               name="today"
               component={TodayWeather}

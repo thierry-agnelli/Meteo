@@ -85,23 +85,10 @@ const TodayWeather = () => {
             });
     };
 
-    // functions
-    // Mise au format fr du timestamp de la date
-    const formatFrDate = (timestamp) => {
-        const formatedDate = moment(tzMoment.tz(timestamp, "Etc/UTC")).locale("fr").format("dddd DD MMMM YYYY, HH:mm");
-
-        return formatedDate[0].toUpperCase() + formatedDate.slice(1);
-    };
-
-
-    // const timestampToHour = timestamp => new Date(timestamp * 1000).toUTCString().slice(17, 22);
-
-
     return (
         <ImageBackground
             source={imagesTable.background}
-            style={{ height: Dimensions.get("screen").height }}
-        >
+            style={{ flex: 1 }}>
             <View style={style.mainSearchWeatherContainer}>
                 <View style={style.searchContainer}>
                     <TextInput placeholder="Ville..." style={style.searchInput} onChangeText={searchCityInput} />
@@ -133,15 +120,6 @@ const TodayWeather = () => {
                             <Text style={{ fontSize: 30, fontWeight: "bold" }}>{currentWeather ? `${(currentWeather.main.temp - 273.15).toFixed(1)}°C` : ""}</Text>
                             <Text style={{ fontSize: 15 }}>{currentWeather ? `Ressenti: ${(currentWeather.main.feels_like - 273.15).toFixed(1)}°C` : ""}</Text>
                         </View>
-                        {/* <View style={style.humidityAndPressure}>
-                            {currentWeather ?
-                                <>
-                                    <Text style={{ marginTop: 15 }}>Pression: {currentWeather.main.pressure}hp</Text>
-                                    <Text style={{ margin: 3 }}>Humidité: {currentWeather.main.humidity}%</Text>
-                                    <Text>Vent: {(currentWeather.wind.speed * 3.6).toFixed(2)}km/h</Text>
-                                </>
-                                : null}
-                        </View> */}
                         <View style={style.todayCenterContainer}>
                             <View style={[style.sideTemp, { paddingLeft: 10 }]}>
                                 {currentWeather ?
@@ -169,18 +147,9 @@ const TodayWeather = () => {
                                 </>
                                 : null}
                         </View>
-                        {/* <View style={style.currentTempAndWind}>
-                            <Text style={{ fontSize: 30, fontWeight: "bold"}}>{currentWeather ? `${(currentWeather.main.temp - 273.15).toFixed(1)}°C` : ""}</Text>
-                            <Text style={{ fontSize: 15 }}>{currentWeather ? `Ressenti: ${(currentWeather.main.feels_like - 273.15).toFixed(1)}°C` : ""}</Text>
-                        </View> */}
                     </View>
                     <View style={style.currentWeatherBottom}>
-                        <View style={style.dailyForecastContainer}>
-                            <Text style={{ fontSize: 20 }}>Prévisions du jour :</Text>
-                            <View style={{ flex: 1 }}>
-                                <ForecastContainer forecast={forecast} />
-                            </View>
-                        </View>
+                        <ForecastContainer title={"Prévision du jour:"} forecast={forecast} flex={0.6}/>
                     </View>
                 </View>
             </View>
